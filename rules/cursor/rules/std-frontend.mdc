@@ -1,0 +1,17 @@
+---
+description: Frontend - componentes, responsive y sistema de diseño (fuente de verdad en docs/standards/)
+globs: **/*.tsx,**/*.jsx,**/*.vue,**/*.svelte,**/*.css,**/*.scss
+alwaysApply: false
+---
+
+# Frontend
+
+Normas: `docs/standards/frontend.md`, `responsive.md`, `design-system.md`. Framework, carpetas y comandos: `docs/standards/stack.md`. Ajustá los `globs` de arriba a las extensiones de tu stack.
+
+- Componente en carpeta: vista (solo marcado) + lógica aparte (hook / composable / servicio, según `stack.md §3`) + tipos + estilos + `parts/` + `index`.
+- `lógica → service del feature → cliente HTTP único`; ningún componente llama al API directamente.
+- Lógica y tipos según su alcance: componente → `features/<mod>/` → `src/`.
+- Solo tokens del tema; montos y fechas con los formateadores compartidos.
+- Mobile first, 360 px a escritorio, sin scroll horizontal; revisar 390 / 768 / 1280 px.
+- Estados de carga, vacío y error; filtros con "Filtros (n)" + etiquetas activas.
+- Verificar con los comandos de `stack.md §4`.

@@ -1,0 +1,8 @@
+# El kit es solo texto: nada de secretos ni archivos locales.
+.env
+.env.*
+*.bak
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

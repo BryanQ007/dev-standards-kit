@@ -1,0 +1,17 @@
+---
+description: Backend - capas, patrones y tests (fuente de verdad en docs/standards/)
+globs: **/*.py,**/*.ts,**/*.java,**/*.kt,**/*.php,**/*.go,**/*.cs,**/*.rb
+alwaysApply: false
+---
+
+# Backend
+
+Normas: `docs/standards/backend.md`, `architecture.md`, `testing.md`. Framework, carpetas, equivalencias y comandos: `docs/standards/stack.md`. Ajustá los `globs` de arriba al lenguaje del backend (si front y back comparten extensión, limitá por carpeta, p. ej. `<backend>/**/*.ts`).
+
+- `router → service → repository → DAO`; ninguna capa se salta a otra.
+- Router/controller: solo HTTP + inyección + envelope `{data, error}`. Service: reglas `RN-xx` y errores de dominio con `code`.
+- DAO: una tabla o función, siempre filtrado por organización; sin borrado.
+- Acción crítica → `require_app_action("<recurso>.<accion>", change_reason)` antes que cualquier regla.
+- Lo atómico en varias tablas → transacción (función SQL o del ORM).
+- Tests: unitario con fakes de la misma firma + integración del endpoint; solo datos sintéticos.
+- Lint, límite de 200 líneas y tests antes de cerrar (`stack.md §4`).

@@ -1,0 +1,16 @@
+---
+description: Base de datos - catálogos, históricos, aislamiento, migraciones y seeders (fuente de verdad en docs/standards/)
+globs: **/alembic/**,**/migrations/**,**/prisma/**,**/sql/**,**/seeds/**,**/*.sql
+alwaysApply: false
+---
+
+# Base de datos
+
+Norma: `docs/standards/database.md`. Motor, herramienta de migraciones y comandos: `docs/standards/stack.md`.
+
+- Sin enums ni `check (x in (...))` de negocio: tablas catálogo (`id`, `code`, `name`).
+- Estado → `status_id` + histórico por trigger; versiones con `valid_from` / `valid_to`.
+- `organization_id` en toda tabla de negocio + RLS si el motor la tiene; sin borrado para el rol de usuario.
+- Una migración o un seeder ya aplicados **no se editan**: el cambio va en el número siguiente.
+- Probar en una base descartable; entregar el SQL incremental y la lista en orden.
+- Seeders idempotentes, con datos ficticios.

@@ -1,0 +1,18 @@
+---
+description: Normas transversales del proyecto (fuente de verdad en docs/standards/)
+alwaysApply: true
+---
+
+# Normas transversales
+
+Fuente de verdad: `docs/standards/README.md`. Este archivo solo resume y apunta.
+
+- **Stack:** tecnologías de front y back, carpetas, equivalencias de patrones y comandos en `docs/standards/stack.md`. Leerlo antes de tocar código; no agregar tecnologías que no figuren ahí sin acordarlo.
+- Ningún archivo de código supera 200 líneas; una responsabilidad por archivo.
+- Reglas de negocio solo en los services del backend; todo acceso a datos filtrado por organización.
+- Bajas lógicas: nada de negocio se borra; "Dar de baja" con motivo.
+- Acciones críticas: permiso + motivo obligatorio.
+- Nunca secretos, valores del `.env` ni datos personales en código, tests, seeders o respuestas.
+- Nombres compuestos y descriptivos en inglés (`docs/standards/naming.md`).
+- Un hito = máx. 5 archivos de trabajo + 3 de seguimiento (`docs/standards/workflow.md`).
+- Antes de empezar: `docs/current_stage.md`, el hito en `docs/plan.md` y la norma del área.
