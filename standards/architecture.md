@@ -113,6 +113,14 @@ Lo que todo registro de negocio tiene "de fábrica":
 - Cada capacidad externa es un **Port** con uno o más **Adapters**; la elección es por configuración.
 - Las credenciales de proveedores van solo en variables de entorno del backend.
 - Un adaptador "de prueba" permite desarrollar sin el proveedor real.
+- **La configuración:** una variable por capacidad (y por canal, si hay varios), con valor por defecto `none`.
+  - El adaptador de prueba (`test`) **no funciona en producción**: ahí cuenta como `none`.
+  - Sin adaptador real, el endpoint responde un error propio "no configurado" (p. ej. **503 `integration_not_configured`**) y la pantalla lo muestra así.
+  - **Nunca se simula un éxito** (un envío, una firma, un cobro).
+- **Lo que pide el usuario y no se puede entregar:** si existe una alternativa manual, se ofrece (p. ej. **copiar** un enlace para mandarlo por fuera). Si no, se informa que todavía no está disponible.
+- **Logs:** nunca llevan el destino (email, celular) ni el contenido (códigos, textos); solo canal y propósito. En pantalla, el destino se muestra enmascarado (`a***@d***.com`, `*** *** **12`).
+- **Probar a mano en desarrollo:** si el adaptador de prueba guarda los mensajes en memoria, hace falta una forma de verlos que no exista en producción y no pase por los logs. Por ejemplo, un endpoint solo de desarrollo o un archivo local ignorado por git.
+- **Un integrador externo** (orquestadores como n8n, agentes de IA) entra **solo por la API**, con una credencial técnica por organización y las mismas reglas y permisos que una persona.
 - Archivos: se guarda solo lo que no se puede regenerar; claves por organización y por huella (`sha256`), sin sobrescribir ni borrar.
 
 ### 7.1 Notificaciones y eventos: cuándo hace falta un broker o Redis

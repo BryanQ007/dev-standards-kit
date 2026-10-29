@@ -18,6 +18,9 @@
 | Autenticación | Supabase Auth (JWT, verificado con JWKS) | |
 | Almacenamiento de archivos | S3 compatible (SeaweedFS local / Supabase Storage) | |
 | Contenedores | Docker Compose | |
+| Gestor de paquetes JS | `pnpm` (nunca `npm` ni `npx`: `pnpm exec`, `pnpm dlx`) | Con `minimumReleaseAge` y scripts de instalación bloqueados (security.md §8) |
+| Gestor de paquetes del backend | `uv` (lockfile `uv.lock`) | Antigüedad mínima con `exclude-newer` |
+| Antigüedad mínima de una versión nueva | 7 días | Paquetes e imágenes de Docker |
 
 ## 2. Carpetas
 
@@ -52,9 +55,9 @@
 
 | Qué | Comando |
 |---|---|
-| Formato frontend | `npx prettier --write <archivos>` |
-| Lint frontend | `npx eslint <archivos>` |
-| Tipos frontend | `npx tsc --noEmit -p .` |
+| Formato frontend | `pnpm exec prettier --write <archivos>` |
+| Lint frontend | `pnpm exec eslint <archivos>` |
+| Tipos frontend | `pnpm exec tsc --noEmit -p .` |
 | Lint backend | `docker compose run --rm backend ruff check app tests` |
 | Límite de 200 líneas | `python scripts/check_max_lines.py` (back) · ESLint `max-lines` (front) |
 | Tests unitarios | `docker compose run --rm backend pytest tests/unit -q` |
@@ -62,6 +65,9 @@
 | Suite completa | `docker compose run --rm backend pytest` |
 | SQL de una migración | `docker compose run --rm backend sh scripts/export_migration_sql.sh NNNN` |
 | Levantar el entorno | `docker compose up -d` |
+| Versión de la base (última migración) | `select version_num from alembic_version;` |
+| Auditoría de dependencias | `pnpm audit --prod` (frontend) · `docker compose run --rm backend uv run pip-audit` · `docker scout cves <imagen>` (procedimiento `std-dependency-audit`) |
+| Fecha de publicación de una versión | `pnpm view <paquete>@<versión> time --json` · `https://pypi.org/pypi/<paquete>/<versión>/json` (`upload_time`) |
 
 ## 5. Particularidades del stack
 

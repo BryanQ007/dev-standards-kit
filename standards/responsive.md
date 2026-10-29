@@ -42,7 +42,13 @@ Toda pantalla funciona **desde 360 px** (celular) hasta escritorio, **sin scroll
 Cada pantalla tocada se revisa en **390 px**, **768 px** y **1280 px**:
 
 - Con el servidor de desarrollo, en DevTools → modo dispositivo.
-- Sin navegador a mano: cargar la página en un `<iframe>` de ese ancho y capturarla con un navegador headless (las ventanas headless no bajan de ~500 px de ancho; por eso el iframe).
+- **Sin navegador a mano:** se maneja un navegador headless por su **protocolo de depuración** (Chrome DevTools Protocol, desde un script o con Playwright/Puppeteer). Se emula el ancho real (`Emulation.setDeviceMetricsOverride`, con `mobile` en los anchos chicos), se espera en **tiempo real** y se captura. En la misma corrida se mide `document.documentElement.scrollWidth`: si es mayor que el ancho, hay scroll horizontal.
+- **Trampas conocidas:**
+  - La captura simple con `--screenshot` y `--virtual-time-budget` **no espera la red**: la página queda en "cargando".
+  - Las ventanas headless no bajan de ~500 px, así que una captura de "390 px" sale recortada.
+  - El `<iframe>` sirve solo para páginas estáticas.
+- **Pantallas con datos:** las respuestas del backend se **simulan en el navegador** (`Fetch.enable` + `Fetch.fulfillRequest`) con datos ficticios, así se revisan todos los estados sin tocar datos reales.
+- **Pantallas públicas** (sin sesión): se revisan también contra el backend real con un token inventado, para ver el estado "no disponible".
 - El hito anota en el changelog qué anchos se revisaron.
 
 ## 4. Checklist

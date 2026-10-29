@@ -18,6 +18,9 @@
 | Autenticación | JWT (SimpleJWT o proveedor externo) | |
 | Almacenamiento de archivos | S3 compatible (django-storages) | |
 | Contenedores | Docker Compose | |
+| Gestor de paquetes JS | `pnpm` (nunca `npm` ni `npx`: `pnpm exec`, `pnpm dlx`) | Con `minimumReleaseAge` y scripts de instalación bloqueados (security.md §8) |
+| Gestor de paquetes del backend | `uv` (lockfile `uv.lock`) | Antigüedad mínima con `exclude-newer` |
+| Antigüedad mínima de una versión nueva | 7 días | Paquetes e imágenes de Docker |
 
 ## 2. Carpetas
 
@@ -52,14 +55,17 @@
 
 | Qué | Comando |
 |---|---|
-| Formato y lint frontend | `npx prettier --write <archivos> && npx eslint <archivos>` |
-| Tipos frontend | `npx nuxi typecheck` |
+| Formato y lint frontend | `pnpm exec prettier --write <archivos> && pnpm exec eslint <archivos>` |
+| Tipos frontend | `pnpm exec nuxi typecheck` |
 | Lint backend | `ruff check .` |
 | Límite de 200 líneas | `python scripts/check_max_lines.py` |
 | Tests unitarios | `pytest apps -m unit -q` |
 | Integración de un módulo | `pytest apps/<mod>/tests/integration -q` |
 | SQL de una migración | `python manage.py sqlmigrate <app> <NNNN>` |
 | Levantar el entorno | `docker compose up -d` |
+| Versión de la base (última migración) | `select app, name, applied from django_migrations order by applied desc limit 5;` |
+| Auditoría de dependencias | `pnpm audit --prod` (frontend) · `docker compose run --rm backend uv run pip-audit` · `docker scout cves <imagen>` (procedimiento `std-dependency-audit`) |
+| Fecha de publicación de una versión | `pnpm view <paquete>@<versión> time --json` · `https://pypi.org/pypi/<paquete>/<versión>/json` (`upload_time`) |
 
 ## 5. Particularidades del stack
 

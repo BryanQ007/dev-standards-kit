@@ -14,3 +14,5 @@ Norma: `docs/standards/database.md`. Motor, herramienta de migraciones y comando
 - Una migración o un seeder ya aplicados **no se editan**: el cambio va en el número siguiente.
 - Probar en una base descartable; entregar el SQL incremental y la lista en orden.
 - Seeders idempotentes, con datos ficticios.
+- Una migración no depende de valores que carga un seeder: los inserta ella misma (idempotente) y se prueba también en una base nueva.
+- Normalizar al máximo (3FN): muchos a muchos con tabla intermedia, sin listas ni datos copiados; estados con patrón State (`<entidad>_status_transitions` + trigger); cada migración registra su versión en la tabla de control (`database.md §4, §6, §9.1`).

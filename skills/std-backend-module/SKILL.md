@@ -18,11 +18,13 @@ La norma es **`docs/standards/backend.md`** (y `architecture.md`, `security.md`,
    - router/controller: solo HTTP + inyección, envelope `{data, error}`, nombre de handler verbo + recurso.
      Si un archivo pasa de ~150 líneas, partir por responsabilidad.
 3. **Reglas transversales:**
-   - acción crítica → guardia `require_app_action("<recurso>.<accion>", change_reason)` antes que cualquier otra regla;
+   - acción crítica → guardia `require_app_action("<recurso>.<accion>", change_reason)` antes que cualquier otra regla. El motivo obligatorio u opcional lo dice el catálogo de acciones (`security.md §4`);
+   - el service valida y da errores claros, y la base vuelve a validar lo atómico. Los errores propios de la base (códigos de error del motor) se traducen a los **mismos** códigos de dominio;
    - sin `DELETE`: baja lógica con motivo;
    - listados con el contrato común (`search`, `order_by`, `page`…);
    - lo atómico en varias tablas → transacción (ver `std-database-migration`);
-   - integraciones como Port + Adapter elegido por configuración;
+   - integraciones como Port + Adapter elegido por configuración. Valor por defecto "ninguno", adaptador de prueba solo fuera de producción, "no configurado" sin proveedor y nunca un éxito simulado (`architecture.md §7`);
+   - endpoints públicos sin sesión: los autoriza solo el token, con el cliente de sistema filtrado por la organización del token (`security.md §6`). Van en un router propio, registrado sin la dependencia de sesión;
    - notificaciones o eventos → outbox en la misma transacción + worker; un broker o Redis solo si `architecture.md §7.1` lo justifica;
 4. **Registrar** el router en la App Factory si es nuevo.
 5. **Tests** con `std-backend-tests`: unitario con fakes por cada regla, integración del endpoint.

@@ -3,7 +3,8 @@
 Este archivo solo conecta Claude Code con las normas del proyecto. **La fuente de verdad es [docs/standards/](docs/standards/README.md)**; no se copian reglas acá.
 
 - Idioma: respuestas, documentación y commits en el idioma del equipo; identificadores de código en inglés.
-- Commits: solo con autorización. Si no la hay, dejar cada hito en stage (`git add`) y sugerir el mensaje `Hx.y: descripción`.
+- Commits: a nombre de la persona. No commitear ni dejar rastro de agente (sin coautores, sin "Generated with", sin cambiar el usuario de git). Al terminar cada hito, dejarlo en stage y entregar el mensaje `Hx.y: descripción` con el código y el orden del hito (skill `std-commit-handoff`).
+- Un hito por vez en el árbol de trabajo. La documentación de `docs/` va en el mismo commit y no cuenta para el límite de archivos (`docs/standards/workflow.md`).
 
 ## Normas y stack (se cargan automáticamente)
 

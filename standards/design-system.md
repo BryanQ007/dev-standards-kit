@@ -41,6 +41,9 @@ Los tokens semánticos se derivan de la marca (`primary: brand.<color>`), así u
 ## 4. Reglas de uso
 
 - En componentes: clases semánticas (`bg-primary`, `text-muted-foreground`, `border-border`).
+- **`*-foreground` va solo sobre su color lleno** (`bg-warning text-warning-foreground`): suele ser blanco.
+  - **Sobre un fondo tenue** (`bg-warning/10`), el texto va en `text-foreground` o en el color mismo (`text-warning`), y el ícono en el color.
+  - **Ejemplo de aviso legible:** `border border-warning/40 bg-warning/10 text-foreground`, con el ícono en `text-warning`.
 - **Prohibido:** `#hex`, `rgb()`, `hsl(...)` literales y clases de paleta cruda o arbitraria (`bg-indigo-600`, `text-[#333]`).
 - Gráficos SVG: variables en los atributos (`stroke="hsl(var(--chart-1))"`). Siguen el modo oscuro solos.
 - Solo si una librería no acepta `var()`: `themeEngine.getColorToken("chart-1", resolvedColorMode)`.
@@ -65,6 +68,17 @@ Button/
 - Accesibles: foco visible (`ring`), `aria-*`, contraste AA.
 - **El UI kit no conoce el dominio:** nada de nombres de negocio dentro de `components/ui/`.
 - Componentes base recomendados: `Button`, `Input`, `Select`, `FormField`, `Card`, `Modal`, `DataTable`, `StatCard`, `FilterMenu`, `ActiveFilterChips`, `CriticalActionConfirm`.
+
+### 5.1 `Modal`
+
+- **Es una columna que nunca supera la pantalla** (`max-h-[calc(100dvh-2rem)]`): el título y el pie quedan siempre a la vista y **solo el cuerpo se desplaza**.
+  - Un `<form>` que envuelve el cuerpo y el pie también es columna (`[&>form]:flex [&>form]:flex-col [&>form]:min-h-0`).
+  - Los componentes que van adentro **no** se ponen alto propio.
+- **No se abre un modal encima de otro ni se anida una confirmación adentro:** la confirmación (`CriticalActionConfirm`) se renderiza como **hermana** del modal.
+- **Un sub-paso dentro del modal** (p. ej. dar de alta a una persona que falta mientras se carga un contrato):
+  - se resuelve **cambiando el contenido del mismo modal**, con "← Volver";
+  - al terminar, se vuelve al paso anterior con lo creado ya elegido;
+  - el estado del formulario vive en un hook que sigue montado, así no se pierde lo cargado.
 
 ## 6. Checklist
 

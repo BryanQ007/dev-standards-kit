@@ -12,6 +12,10 @@ Las normas de `docs/standards/` son independientes de la tecnología; **`docs/st
 1. **Leer** `docs/standards/stack.md` (plantilla o versión actual) y `docs/standards/architecture.md`.
 2. **Detectar lo que ya existe** en el repo, sin suponer: `package.json`, `pyproject.toml` / `requirements.txt`, `composer.json`, `pom.xml` / `build.gradle`, `go.mod`, `docker-compose*.yml`, carpetas de migraciones, configuración de linters y de tests. Anotar versiones reales.
 3. **Preguntar solo lo que falte o sea una decisión** (framework de front y de back, base, ORM o cliente, herramienta de migraciones, auth, almacenamiento, idioma). Si el usuario no tiene preferencia, proponer una opción con su porqué, en una línea.
+   - **Gestor de paquetes:** en JavaScript/TypeScript siempre **pnpm** (`security.md §8.1`). Si el repo usa npm o yarn, anotar la mudanza (`pnpm import`) como hito propio.
+   - **Backend:** un gestor con lockfile (p. ej. `uv`).
+   - **Antigüedad mínima de una versión nueva:** proponer **7 días**.
+   - Completar en §4 los comandos de auditoría y de fecha de publicación.
 4. **Completar las 6 secciones** de `stack.md`:
    1. tecnologías y versiones;
    2. carpetas reales;

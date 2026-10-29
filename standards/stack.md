@@ -21,6 +21,9 @@
 | Almacenamiento de archivos | `<S3 compatible / proveedor>` | |
 | Notificaciones y eventos | `<outbox + worker / broker (Kafka, RabbitMQ…) / —>` | Redis: `<no / caché · rate limiting · locks>` · criterio: [architecture.md §7.1](architecture.md) |
 | Contenedores | `<Docker Compose / —>` | |
+| Gestor de paquetes JS | `pnpm` (nunca `npm` ni `npx`: `pnpm exec`, `pnpm dlx`) | Con `minimumReleaseAge` y scripts de instalación bloqueados ([security.md §8](security.md)) |
+| Gestor de paquetes del backend | `<p. ej. uv / poetry / pip con --require-hashes / pnpm / Maven>` | Con lockfile; antigüedad mínima si lo permite (`uv --exclude-newer`) |
+| Antigüedad mínima de una versión nueva | `<p. ej. 7 días>` | Ningún paquete ni imagen más nuevo que esto |
 
 ## 2. Carpetas
 
@@ -57,9 +60,9 @@ Cómo se implementa en este stack cada pieza que piden las normas:
 
 | Qué | Comando |
 |---|---|
-| Formato frontend | `<p. ej. npx prettier --write <archivos>>` |
-| Lint frontend | `<p. ej. npx eslint <archivos>>` |
-| Tipos frontend | `<p. ej. npx tsc --noEmit -p .>` |
+| Formato frontend | `<p. ej. pnpm exec prettier --write <archivos>>` |
+| Lint frontend | `<p. ej. pnpm exec eslint <archivos>>` |
+| Tipos frontend | `<p. ej. pnpm exec tsc --noEmit -p .>` |
 | Lint backend | `<p. ej. ruff check app tests>` |
 | Límite de 200 líneas | `<p. ej. python scripts/check_max_lines.py / regla max-lines de ESLint>` |
 | Tests unitarios | `<…>` |
@@ -67,6 +70,9 @@ Cómo se implementa en este stack cada pieza que piden las normas:
 | Suite completa | `<…>` |
 | Generar el SQL de una migración | `<…>` |
 | Levantar el entorno | `<p. ej. docker compose up -d>` |
+| Versión de la base (última migración) | `<p. ej. select version_num from alembic_version; · select version, name, applied_at from schema_migrations order by applied_at desc limit 1;>` |
+| Auditoría de dependencias | `<p. ej. pnpm audit --prod · uv run pip-audit · docker scout cves <imagen>>` (procedimiento `std-dependency-audit`) |
+| Fecha de publicación de una versión | `<p. ej. pnpm view <paquete>@<versión> time --json · PyPI: https://pypi.org/pypi/<paquete>/<versión>/json>` |
 
 ## 5. Particularidades del stack
 

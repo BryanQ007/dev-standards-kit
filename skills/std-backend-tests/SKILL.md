@@ -18,5 +18,8 @@ La norma es **`docs/standards/testing.md`**; el runner, las carpetas y los coman
    - Comprobar el **código** de error, no solo el estado HTTP.
    - Acciones críticas: `change_reason` de 3+ caracteres, y el caso sin motivo.
    - Lo preparado con el cliente de sistema se limpia al final, aunque el test falle.
+   - Integraciones: el adaptador de prueba se activa solo dentro del test, reemplazando la lectura de la configuración. Lo enviado se lee de lo que registró el adaptador.
+   - Credenciales de un solo uso: uso correcto, error con intentos que quedan, agotamiento, y que ya no sirve después de usarla o revocarla.
+   - Si el test pasa de 200 líneas, se extraen helpers de preparación (`_create_…`, `_latest_…`).
 4. **Correr** con los comandos de `stack.md §4`: unitarios y la integración del módulo; la suite completa solo al cerrar una fase o si se tocó algo compartido.
 5. **Informar** el comando y el resultado (para "Comandos ejecutados" del changelog). Si algo falla, mostrar la salida y no dar el hito por hecho.

@@ -18,6 +18,8 @@
 | Autenticación | JWT (proveedor externo o Passport) | |
 | Almacenamiento de archivos | S3 compatible | |
 | Contenedores | Docker Compose | |
+| Gestor de paquetes | `pnpm` (nunca `npm` ni `npx`: `pnpm exec`, `pnpm dlx`), front y back | `minimumReleaseAge` y scripts de instalación bloqueados (security.md §8) |
+| Antigüedad mínima de una versión nueva | 7 días | Paquetes e imágenes de Docker |
 
 ## 2. Carpetas
 
@@ -52,14 +54,17 @@
 
 | Qué | Comando |
 |---|---|
-| Formato | `npx prettier --write <archivos>` |
-| Lint | `npx eslint <archivos>` (regla `max-lines: 200`) |
-| Tipos | `npx tsc --noEmit -p .` |
-| Tests unitarios | `npm run test` |
-| Integración de un módulo | `npm run test:e2e -- <mod>` |
-| Suite completa | `npm run test && npm run test:e2e` |
-| SQL de una migración | `npx prisma migrate diff …` / `npx prisma migrate dev --create-only` |
+| Formato | `pnpm exec prettier --write <archivos>` |
+| Lint | `pnpm exec eslint <archivos>` (regla `max-lines: 200`) |
+| Tipos | `pnpm exec tsc --noEmit -p .` |
+| Tests unitarios | `pnpm run test` |
+| Integración de un módulo | `pnpm run test:e2e -- <mod>` |
+| Suite completa | `pnpm run test && pnpm run test:e2e` |
+| SQL de una migración | `pnpm exec prisma migrate diff …` / `pnpm exec prisma migrate dev --create-only` |
 | Levantar el entorno | `docker compose up -d` |
+| Versión de la base (última migración) | `select migration_name, finished_at from _prisma_migrations order by finished_at desc limit 1;` |
+| Auditoría de dependencias | `pnpm audit --prod` · `docker scout cves <imagen>` (procedimiento `std-dependency-audit`) |
+| Fecha de publicación de una versión | `pnpm view <paquete>@<versión> time --json` |
 
 ## 5. Particularidades del stack
 

@@ -49,6 +49,12 @@ Reglas de los fakes:
 - Sesiones por fixture que **registran una organización con el registro real del sistema**, inician sesión y se borran al terminar.
 - Los datos se crean **por la API**, como un usuario. El cliente de sistema solo prepara lo que la API todavía no permite crear, y se limpia en un `finally`.
 - Configuraciones que cambian el comportamiento (planes, límites, flags) se fijan en una fixture para que el resultado no dependa del `.env`.
+- **Integraciones en un test de punta a punta:**
+  - el adaptador de prueba se activa **solo durante ese test** (reemplazando la lectura de la configuración), nunca en el `.env`;
+  - lo que "se envió" (p. ej. un código) se lee de lo que registró el adaptador;
+  - el test también prueba el camino "no configurado".
+- **Flujos con credenciales de un solo uso** (enlaces, códigos): se prueba el uso correcto, el error (intentos que quedan), el agotamiento y que el enlace **ya no sirve** después de usarlo o revocarlo.
+- **Ante un 500 o un dato que falta en una prueba contra el entorno real:** primero se mira qué hay en la base (solo lectura) y qué versión de migración tiene, antes de tocar código.
 
 ## 5. Nombres y forma
 

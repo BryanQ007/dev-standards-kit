@@ -17,4 +17,5 @@ La norma es **[docs/standards/flows.md](../../docs/standards/flows.md)**. Esta s
 4. **Diagramas (§4):** `stateDiagram-v2` con los `code` del catálogo si cambia un estado; un `sequenceDiagram` del camino feliz (≤ 5 participantes); `flowchart` solo para decisiones con varias ramas.
 5. **Controlar (§5 y §6):** cada paso con quién · acción · función · HTTP · efecto en la base; acciones críticas con su código y si el motivo es obligatorio; datos ficticios; limitaciones escritas; notificaciones documentadas según la regla 8 (el evento guardado, el canal y qué pasa si falla).
 6. **Enlazar:** el `F#` del circuito al detalle, el detalle al `F#`, y los dos en el índice.
-7. **Hito:** el flujo cuenta como archivo de trabajo. Si el cambio también toca código, va en el mismo hito o en el anterior (primero la especificación).
+7. **Hito:** el flujo es documentación: **no cuenta** para el límite de 5 archivos de trabajo y va **en el mismo commit** que el código que lo cambia. Si es solo diseño, va en un hito propio, antes del código (primero la especificación).
+8. **Estado:** cada flujo dice qué está **construido** y qué es **diseño**, y lista las limitaciones conocidas. Al construir algo, en ese mismo commit se actualiza la marca y se tachan o reescriben las limitaciones que se resolvieron.

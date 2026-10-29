@@ -20,9 +20,12 @@ La norma es **`docs/standards/frontend.md`** (y `design-system.md`, `responsive.
    - estados de carga, vacío, error y datos;
    - listados con búsqueda a la izquierda y "Filtros (n)" a la derecha, etiquetas de filtros activos, paginación del servidor;
    - catálogos y ubicaciones cargados del API, con búsqueda en listas largas;
-   - acciones críticas con confirmación (antes → después) y motivo; nada se "elimina": "Dar de baja" / "Reactivar";
-   - botones según los permisos que informa el backend.
-6. **Estilo:** solo tokens del tema; montos y fechas con los formateadores compartidos; mobile first (`std-responsive`).
+   - acciones críticas con confirmación (antes → después): "Motivo *" o "Comentario (opcional)" según lo que informe el backend para esa acción. Nada se "elimina": "Dar de baja" / "Reactivar";
+   - botones según los permisos que informa el backend;
+   - modales: columna en la que solo se desplaza el cuerpo. No se abre un modal encima de otro: la confirmación va como **hermana**, y un sub-paso (crear lo que falta) cambia el contenido del mismo modal y vuelve con lo creado elegido, sin perder lo cargado (`design-system.md §5.1`);
+   - integraciones: si el backend responde "no configurado", la pantalla lo dice con su alternativa (p. ej. copiar) y nunca da por hecho un envío;
+   - páginas públicas (sin sesión): fuera de las rutas protegidas, `noindex`, sin *referrer*, con estados "no disponible", "listo" y error.
+6. **Estilo:** solo tokens del tema (y `*-foreground` solo sobre su color lleno); montos y fechas con los formateadores compartidos; mobile first (`std-responsive`).
 7. **Nombres** descriptivos: `handleSubmitXForm`, `isLoadingX`, `selectedXId`, `fetchXList`.
 8. **Verificar** con los comandos de `stack.md §4` (formato, lint, tipos) sobre los archivos tocados; ningún archivo > 200 líneas. Respetar las advertencias de `stack.md §5`.
 9. **Informar** archivos tocados, comandos corridos con su resultado y cómo probarlo en pantalla.
