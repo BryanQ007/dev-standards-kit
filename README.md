@@ -161,7 +161,7 @@ Es la forma más simple: un menú en la consola pregunta qué instalar.
    ==================================================
      dev-standards-kit 1.3.0 · instalador
    ==================================================
-     1. Instalar todo el kit (normas, todas las skills y las reglas de todas las herramientas)
+     1. Instalar todas las skills y las reglas de las herramientas que elijas
      2. Instalar eligiendo skills y herramientas
      3. Adoptar el estándar en un proyecto ya creado (no pisa nada, deja el informe)
      4. Ver qué hace cada skill
@@ -172,7 +172,7 @@ Es la forma más simple: un menú en la consola pregunta qué instalar.
    - **la ruta del proyecto**;
    - **el stack**: un perfil, o `0` para la plantilla en blanco;
    - **en la opción 2, las skills**: sus números separados por espacio, por ejemplo `4 9 12`, o `todas`;
-   - **en las opciones 2 y 3, las herramientas**: sus números, `todas` o `ninguna`. Las normas y los procedimientos se instalan siempre.
+   - **en las opciones 1, 2 y 3, las herramientas con las que vas a trabajar**: sus números separados por espacio (`1 3`), `todas` o `ninguna`. El menú ofrece `claude`, `codex`, `cursor` y `antigravity`. `codex` y `antigravity` leen `AGENTS.md`, así que se instala una sola vez y no se copian archivos de las otras herramientas. Las normas y los procedimientos se instalan siempre.
 5. El menú muestra un **resumen** y la **simulación** de lo que copiaría. Respondé `s` para instalar, o `N` para salir sin tocar nada.
 6. Revisá lo copiado con `git diff` en el proyecto y seguí con el Tutorial 1 (proyecto nuevo) o el Tutorial 2 (proyecto existente) desde el paso de completar `stack.md`.
 

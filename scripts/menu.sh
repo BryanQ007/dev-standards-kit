@@ -7,7 +7,7 @@ set -eu
 KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 INSTALLER="$KIT_DIR/scripts/install.sh"
 KIT_VERSION=$(cat "$KIT_DIR/VERSION" 2>/dev/null || echo "?")
-ALL_TOOLS="agents claude cursor copilot windsurf cline gemini"
+MENU_TOOLS="claude codex cursor antigravity"
 
 print_title() {
   echo ""
@@ -106,19 +106,40 @@ ask_skills() {
   if [ -z "$SELECTED_SKILLS" ]; then echo "  Ninguna válida: se instalan todas."; SELECTED_SKILLS="all"; fi
 }
 
+tool_key_for_label() {  # etiqueta del menú -> herramienta del instalador (codex y antigravity leen AGENTS.md)
+  case "$1" in
+    claude) echo "claude" ;;
+    cursor) echo "cursor" ;;
+    codex|antigravity) echo "agents" ;;
+  esac
+}
+
 ask_tools() {
   print_title "herramientas"
   tool_number=0
-  for tool_name in $ALL_TOOLS; do
-    tool_number=$((tool_number + 1)); printf '  %d. %s\n' "$tool_number" "$tool_name"
+  for tool_label in $MENU_TOOLS; do
+    tool_number=$((tool_number + 1)); printf '  %d. %s\n' "$tool_number" "$tool_label"
   done
+  echo "  codex y antigravity leen AGENTS.md: se instala una sola vez."
   echo "  Las normas y los procedimientos se instalan siempre, uses la herramienta que uses."
-  ask "Números de las herramientas, separados por espacio ('todas' o 'ninguna')" "todas"
-  SELECTED_TOOLS="all"
-  [ "$ANSWER" = "todas" ] && return 0
-  if [ "$ANSWER" = "ninguna" ]; then SELECTED_TOOLS="none"; return 0; fi
-  SELECTED_TOOLS=$(pick_from_list "$ALL_TOOLS" "$ANSWER")
-  if [ -z "$SELECTED_TOOLS" ]; then echo "  Ninguna válida: se instalan todas."; SELECTED_TOOLS="all"; fi
+  while :; do
+    ask "Números de las herramientas que vas a usar, separados por espacio (ej. 1 3; 'todas' o 'ninguna')" ""
+    case "$ANSWER" in
+      "") echo "  Elegí al menos una, o 'ninguna'."; continue ;;
+      todas) SELECTED_TOOLS="claude,agents,cursor"; return 0 ;;
+      ninguna) SELECTED_TOOLS="none"; return 0 ;;
+    esac
+    picked_labels=$(pick_from_list "$MENU_TOOLS" "$(echo "$ANSWER" | tr ',' ' ')")
+    if [ -n "$picked_labels" ]; then
+      SELECTED_TOOLS=""
+      for tool_label in $(echo "$picked_labels" | tr ',' ' '); do
+        tool_key=$(tool_key_for_label "$tool_label")
+        case ",$SELECTED_TOOLS," in *",$tool_key,"*) ;; *) SELECTED_TOOLS="${SELECTED_TOOLS:+$SELECTED_TOOLS,}$tool_key" ;; esac
+      done
+      return 0
+    fi
+    echo "  Ninguna opción válida. Probá de nuevo."
+  done
 }
 
 run_installation() {  # $1 = opciones extra (p. ej. --adopt)
@@ -146,7 +167,7 @@ run_installation() {  # $1 = opciones extra (p. ej. --adopt)
 
 while :; do
   print_title "instalador"
-  echo "  1. Instalar todo el kit (normas, todas las skills y las reglas de todas las herramientas)"
+  echo "  1. Instalar todas las skills y las reglas de las herramientas que elijas"
   echo "  2. Instalar eligiendo skills y herramientas"
   echo "  3. Adoptar el estándar en un proyecto ya creado (no pisa nada, deja el informe)"
   echo "  4. Ver qué hace cada skill"
@@ -155,7 +176,7 @@ while :; do
   ask "Opción" "1"
   SELECTED_SKILLS="all"; SELECTED_TOOLS="all"; STACK_OPTION=""
   case "$ANSWER" in
-    1) ask_target; ask_stack; run_installation "" ;;
+    1) ask_target; ask_stack; ask_tools; run_installation "" ;;
     2) ask_target; ask_stack; ask_skills; ask_tools; run_installation "" ;;
     3) ask_target; ask_stack; ask_tools; run_installation "--adopt" ;;
     4) show_skills ;;

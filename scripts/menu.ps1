@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 $KitDir = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Installer = Join-Path $KitDir "scripts\install.ps1"
 $KitVersion = (Get-Content (Join-Path $KitDir "VERSION") -ErrorAction SilentlyContinue | Select-Object -First 1)
-$AllTools = @("agents", "claude", "cursor", "copilot", "windsurf", "cline", "gemini")
+$MenuTools = @("claude", "codex", "cursor", "antigravity")
 $SkillNames = @(Get-ChildItem -Path (Join-Path $KitDir "skills") -Directory | ForEach-Object { $_.Name })
 $StackNames = @(Get-ChildItem -Path (Join-Path $KitDir "profiles") -Filter "*.md" -File | ForEach-Object { $_.BaseName })
 
@@ -100,16 +100,36 @@ function Read-SkillsChoice {
   return $PickedSkills
 }
 
+function Get-ToolKey([string]$MenuLabel) {
+  # codex y antigravity leen AGENTS.md: ambos van a la herramienta "agents"
+  switch ($MenuLabel) {
+    "claude" { return "claude" }
+    "cursor" { return "cursor" }
+    default { return "agents" }
+  }
+}
+
 function Read-ToolsChoice {
   Show-Title "herramientas"
-  for ($ToolIndex = 0; $ToolIndex -lt $AllTools.Count; $ToolIndex++) { Write-Host ("  {0}. {1}" -f ($ToolIndex + 1), $AllTools[$ToolIndex]) }
+  for ($ToolIndex = 0; $ToolIndex -lt $MenuTools.Count; $ToolIndex++) { Write-Host ("  {0}. {1}" -f ($ToolIndex + 1), $MenuTools[$ToolIndex]) }
+  Write-Host "  codex y antigravity leen AGENTS.md: se instala una sola vez."
   Write-Host "  Las normas y los procedimientos se instalan siempre, uses la herramienta que uses."
-  $TypedTools = Read-Answer "Números de las herramientas, separados por espacio ('todas' o 'ninguna')" "todas"
-  if ($TypedTools -eq "todas") { return @("all") }
-  if ($TypedTools -eq "ninguna") { return @("none") }
-  $PickedTools = @(Select-FromList $AllTools $TypedTools)
-  if ($PickedTools.Count -eq 0) { Write-Host "  Ninguna válida: se instalan todas."; return @("all") }
-  return $PickedTools
+  while ($true) {
+    $TypedTools = Read-Answer "Números de las herramientas que vas a usar, separados por espacio (ej. 1 3; 'todas' o 'ninguna')" ""
+    if ($TypedTools -eq "") { Write-Host "  Elegí al menos una, o 'ninguna'."; continue }
+    if ($TypedTools -eq "todas") { return @("claude", "agents", "cursor") }
+    if ($TypedTools -eq "ninguna") { return @("none") }
+    $PickedLabels = @(Select-FromList $MenuTools $TypedTools)
+    if ($PickedLabels.Count -gt 0) {
+      $ToolKeys = @()
+      foreach ($Label in $PickedLabels) {
+        $Key = Get-ToolKey $Label
+        if ($ToolKeys -notcontains $Key) { $ToolKeys += $Key }
+      }
+      return $ToolKeys
+    }
+    Write-Host "  Ninguna opción válida. Probá de nuevo."
+  }
 }
 
 function Invoke-Installation([string]$TargetFolder, [string]$StackName, [string[]]$Skills, [string[]]$Tools, [bool]$IsAdopt) {
@@ -138,14 +158,14 @@ function Invoke-Installation([string]$TargetFolder, [string]$StackName, [string[
 
 while ($true) {
   Show-Title "instalador"
-  Write-Host "  1. Instalar todo el kit (normas, todas las skills y las reglas de todas las herramientas)"
+  Write-Host "  1. Instalar todas las skills y las reglas de las herramientas que elijas"
   Write-Host "  2. Instalar eligiendo skills y herramientas"
   Write-Host "  3. Adoptar el estándar en un proyecto ya creado (no pisa nada, deja el informe)"
   Write-Host "  4. Ver qué hace cada skill"
   Write-Host "  5. Ver los perfiles de stack"
   Write-Host "  0. Salir"
   switch (Read-Answer "Opción" "1") {
-    "1" { $Folder = Read-TargetFolder; $StackName = Read-StackChoice; Invoke-Installation $Folder $StackName @("all") @("all") $false }
+    "1" { $Folder = Read-TargetFolder; $StackName = Read-StackChoice; $Tools = Read-ToolsChoice; Invoke-Installation $Folder $StackName @("all") $Tools $false }
     "2" {
       $Folder = Read-TargetFolder; $StackName = Read-StackChoice; $Skills = Read-SkillsChoice; $Tools = Read-ToolsChoice
       Invoke-Installation $Folder $StackName $Skills $Tools $false
