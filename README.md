@@ -172,7 +172,11 @@ Es la forma más simple: un menú en la consola pregunta qué instalar.
    - **la ruta del proyecto**;
    - **el stack**: un perfil, o `0` para la plantilla en blanco;
    - **en la opción 2, las skills**: sus números separados por espacio, por ejemplo `4 9 12`, o `todas`;
-   - **en las opciones 1, 2 y 3, las herramientas con las que vas a trabajar**: sus números separados por espacio (`1 3`), `todas` o `ninguna`. El menú ofrece `claude`, `codex`, `cursor` y `antigravity`. `codex` y `antigravity` leen `AGENTS.md`, así que se instala una sola vez y no se copian archivos de las otras herramientas. Las normas y los procedimientos se instalan siempre.
+   - **en las opciones 1, 2 y 3, las herramientas, en dos preguntas:**
+     - **el editor o IDE:** `vscode`, `cursor`, `windsurf` o `jetbrains`. Enter = ninguno. Solo `cursor` y `windsurf` tienen carpeta de reglas propia; `vscode` y `jetbrains` usan lo que elijas en la pregunta del asistente;
+     - **el asistente de IA:** `claude`, `codex`, `antigravity`, `copilot`, `gemini` o `cline`. Son sus números separados por espacio (`1 4`), o `ninguna` si no querés reglas de IA. `codex` y `antigravity` leen `AGENTS.md`, así que se instala una sola vez.
+
+     Así solo se crean las carpetas y los archivos que usás: por ejemplo, `.github/` aparece solo con `copilot`. Las normas y los procedimientos se instalan siempre.
 5. El menú muestra un **resumen** y la **simulación** de lo que copiaría. Respondé `s` para instalar, o `N` para salir sin tocar nada.
 6. Revisá lo copiado con `git diff` en el proyecto y seguí con el Tutorial 1 (proyecto nuevo) o el Tutorial 2 (proyecto existente) desde el paso de completar `stack.md`.
 

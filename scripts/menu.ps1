@@ -7,7 +7,8 @@ $ErrorActionPreference = "Stop"
 $KitDir = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Installer = Join-Path $KitDir "scripts\install.ps1"
 $KitVersion = (Get-Content (Join-Path $KitDir "VERSION") -ErrorAction SilentlyContinue | Select-Object -First 1)
-$MenuTools = @("claude", "codex", "cursor", "antigravity")
+$MenuIdes = @("vscode", "cursor", "windsurf", "jetbrains")
+$MenuAis = @("claude", "codex", "antigravity", "copilot", "gemini", "cline")
 $SkillNames = @(Get-ChildItem -Path (Join-Path $KitDir "skills") -Directory | ForEach-Object { $_.Name })
 $StackNames = @(Get-ChildItem -Path (Join-Path $KitDir "profiles") -Filter "*.md" -File | ForEach-Object { $_.BaseName })
 
@@ -100,36 +101,60 @@ function Read-SkillsChoice {
   return $PickedSkills
 }
 
-function Get-ToolKey([string]$MenuLabel) {
-  # codex y antigravity leen AGENTS.md: ambos van a la herramienta "agents"
-  switch ($MenuLabel) {
-    "claude" { return "claude" }
-    "cursor" { return "cursor" }
-    default { return "agents" }
+function Show-Choices([string[]]$Items) {
+  for ($ChoiceIndex = 0; $ChoiceIndex -lt $Items.Count; $ChoiceIndex++) { Write-Host ("  {0}. {1}" -f ($ChoiceIndex + 1), $Items[$ChoiceIndex]) }
+}
+
+function Get-IdeToolKeys([string]$Ide) {
+  # VS Code y JetBrains no tienen carpeta propia
+  switch ($Ide) {
+    "cursor" { return @("cursor") }
+    "windsurf" { return @("windsurf") }
+    default { return @() }
+  }
+}
+
+function Get-AiToolKeys([string]$Ai) {
+  # codex y antigravity leen AGENTS.md; gemini también lo necesita
+  switch ($Ai) {
+    "claude" { return @("claude") }
+    "codex" { return @("agents") }
+    "antigravity" { return @("agents") }
+    "copilot" { return @("copilot") }
+    "cline" { return @("cline") }
+    "gemini" { return @("agents", "gemini") }
+    default { return @() }
   }
 }
 
 function Read-ToolsChoice {
-  Show-Title "herramientas"
-  for ($ToolIndex = 0; $ToolIndex -lt $MenuTools.Count; $ToolIndex++) { Write-Host ("  {0}. {1}" -f ($ToolIndex + 1), $MenuTools[$ToolIndex]) }
+  $ToolKeys = @()
+  Show-Title "editor o IDE"
+  Show-Choices $MenuIdes
+  Write-Host "  VS Code y JetBrains no necesitan carpeta propia: usan las reglas del asistente que elijas."
+  $TypedIdes = Read-Answer "Números de los editores que usás, separados por espacio (Enter = ninguno)" ""
+  foreach ($Ide in @(Select-FromList $MenuIdes $TypedIdes)) {
+    foreach ($Key in @(Get-IdeToolKeys $Ide)) { if ($ToolKeys -notcontains $Key) { $ToolKeys += $Key } }
+  }
+  Show-Title "asistente de IA"
+  Show-Choices $MenuAis
   Write-Host "  codex y antigravity leen AGENTS.md: se instala una sola vez."
   Write-Host "  Las normas y los procedimientos se instalan siempre, uses la herramienta que uses."
   while ($true) {
-    $TypedTools = Read-Answer "Números de las herramientas que vas a usar, separados por espacio (ej. 1 3; 'todas' o 'ninguna')" ""
-    if ($TypedTools -eq "") { Write-Host "  Elegí al menos una, o 'ninguna'."; continue }
-    if ($TypedTools -eq "todas") { return @("claude", "agents", "cursor") }
-    if ($TypedTools -eq "ninguna") { return @("none") }
-    $PickedLabels = @(Select-FromList $MenuTools $TypedTools)
-    if ($PickedLabels.Count -gt 0) {
-      $ToolKeys = @()
-      foreach ($Label in $PickedLabels) {
-        $Key = Get-ToolKey $Label
-        if ($ToolKeys -notcontains $Key) { $ToolKeys += $Key }
+    $TypedAis = Read-Answer "Números de los asistentes que vas a usar, separados por espacio ('ninguna' para no instalar reglas de IA)" ""
+    if ($TypedAis -eq "ninguna") { break }
+    if ($TypedAis -eq "") { Write-Host "  Elegí al menos uno, o 'ninguna'."; continue }
+    $PickedAis = @(Select-FromList $MenuAis $TypedAis)
+    if ($PickedAis.Count -gt 0) {
+      foreach ($Ai in $PickedAis) {
+        foreach ($Key in @(Get-AiToolKeys $Ai)) { if ($ToolKeys -notcontains $Key) { $ToolKeys += $Key } }
       }
-      return $ToolKeys
+      break
     }
     Write-Host "  Ninguna opción válida. Probá de nuevo."
   }
+  if ($ToolKeys.Count -eq 0) { return @("none") }
+  return $ToolKeys
 }
 
 function Invoke-Installation([string]$TargetFolder, [string]$StackName, [string[]]$Skills, [string[]]$Tools, [bool]$IsAdopt) {

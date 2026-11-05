@@ -7,7 +7,8 @@ set -eu
 KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 INSTALLER="$KIT_DIR/scripts/install.sh"
 KIT_VERSION=$(cat "$KIT_DIR/VERSION" 2>/dev/null || echo "?")
-MENU_TOOLS="claude codex cursor antigravity"
+MENU_IDES="vscode cursor windsurf jetbrains"
+MENU_AIS="claude codex antigravity copilot gemini cline"
 
 print_title() {
   echo ""
@@ -106,40 +107,64 @@ ask_skills() {
   if [ -z "$SELECTED_SKILLS" ]; then echo "  Ninguna válida: se instalan todas."; SELECTED_SKILLS="all"; fi
 }
 
-tool_key_for_label() {  # etiqueta del menú -> herramienta del instalador (codex y antigravity leen AGENTS.md)
+ide_tool_keys() {  # editor elegido -> carpeta de reglas que necesita (VS Code y JetBrains no tienen carpeta propia)
   case "$1" in
-    claude) echo "claude" ;;
     cursor) echo "cursor" ;;
-    codex|antigravity) echo "agents" ;;
+    windsurf) echo "windsurf" ;;
   esac
 }
 
-ask_tools() {
-  print_title "herramientas"
-  tool_number=0
-  for tool_label in $MENU_TOOLS; do
-    tool_number=$((tool_number + 1)); printf '  %d. %s\n' "$tool_number" "$tool_label"
+ai_tool_keys() {  # asistente elegido -> archivos que necesita (codex y antigravity leen AGENTS.md; gemini también lo necesita)
+  case "$1" in
+    claude) echo "claude" ;;
+    codex|antigravity) echo "agents" ;;
+    copilot) echo "copilot" ;;
+    cline) echo "cline" ;;
+    gemini) echo "agents gemini" ;;
+  esac
+}
+
+add_tool_keys() {  # $1 = claves separadas por espacio; las agrega a SELECTED_TOOLS sin repetir
+  for tool_key in $1; do
+    case ",$SELECTED_TOOLS," in *",$tool_key,"*) ;; *) SELECTED_TOOLS="${SELECTED_TOOLS:+$SELECTED_TOOLS,}$tool_key" ;; esac
   done
+}
+
+show_choices() {  # $1 = opciones separadas por espacio; las muestra numeradas
+  choice_number=0
+  for choice_label in $1; do
+    choice_number=$((choice_number + 1)); printf '  %d. %s\n' "$choice_number" "$choice_label"
+  done
+}
+
+ask_tools() {
+  SELECTED_TOOLS=""
+  print_title "editor o IDE"
+  show_choices "$MENU_IDES"
+  echo "  VS Code y JetBrains no necesitan carpeta propia: usan las reglas del asistente que elijas."
+  ask "Números de los editores que usás, separados por espacio (Enter = ninguno)" ""
+  for picked in $(pick_from_list "$MENU_IDES" "$(echo "$ANSWER" | tr ',' ' ')" | tr ',' ' '); do
+    add_tool_keys "$(ide_tool_keys "$picked")"
+  done
+  print_title "asistente de IA"
+  show_choices "$MENU_AIS"
   echo "  codex y antigravity leen AGENTS.md: se instala una sola vez."
   echo "  Las normas y los procedimientos se instalan siempre, uses la herramienta que uses."
   while :; do
-    ask "Números de las herramientas que vas a usar, separados por espacio (ej. 1 3; 'todas' o 'ninguna')" ""
-    case "$ANSWER" in
-      "") echo "  Elegí al menos una, o 'ninguna'."; continue ;;
-      todas) SELECTED_TOOLS="claude,agents,cursor"; return 0 ;;
-      ninguna) SELECTED_TOOLS="none"; return 0 ;;
-    esac
-    picked_labels=$(pick_from_list "$MENU_TOOLS" "$(echo "$ANSWER" | tr ',' ' ')")
-    if [ -n "$picked_labels" ]; then
-      SELECTED_TOOLS=""
-      for tool_label in $(echo "$picked_labels" | tr ',' ' '); do
-        tool_key=$(tool_key_for_label "$tool_label")
-        case ",$SELECTED_TOOLS," in *",$tool_key,"*) ;; *) SELECTED_TOOLS="${SELECTED_TOOLS:+$SELECTED_TOOLS,}$tool_key" ;; esac
+    ask "Números de los asistentes que vas a usar, separados por espacio ('ninguna' para no instalar reglas de IA)" ""
+    if [ "$ANSWER" = "ninguna" ]; then break; fi
+    if [ -z "$ANSWER" ]; then echo "  Elegí al menos uno, o 'ninguna'."; continue; fi
+    picked_ais=$(pick_from_list "$MENU_AIS" "$(echo "$ANSWER" | tr ',' ' ')")
+    if [ -n "$picked_ais" ]; then
+      for picked in $(echo "$picked_ais" | tr ',' ' '); do
+        add_tool_keys "$(ai_tool_keys "$picked")"
       done
-      return 0
+      break
     fi
     echo "  Ninguna opción válida. Probá de nuevo."
   done
+  if [ -z "$SELECTED_TOOLS" ]; then SELECTED_TOOLS="none"; fi
+  return 0
 }
 
 run_installation() {  # $1 = opciones extra (p. ej. --adopt)
